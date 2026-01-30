@@ -1,100 +1,11 @@
 
-import React, { useState } from "react";
-import { StyleSheet, View, ActivityIndicator, Platform } from "react-native";
-import { useTheme } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
+import { StyleSheet, View, ActivityIndicator, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-export default function HomeScreen() {
-  const theme = useTheme();
-  const [loading, setLoading] = useState(true);
-
-  console.log("HomeScreen: Loading website in WebView");
-
-  const websiteUrl = "https://ogzodefnqsype.mocha.app";
-
-  // Inject CSS to adjust font sizes to match original website on phone
-  const injectedJavaScript = `
-    (function() {
-      // Set viewport to match desktop view with proper scaling
-      var meta = document.querySelector('meta[name="viewport"]');
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.name = 'viewport';
-        document.head.appendChild(meta);
-      }
-      meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-      
-      // Adjust text size to match original website
-      var style = document.createElement('style');
-      style.innerHTML = \`
-        * {
-          -webkit-text-size-adjust: 100% !important;
-          text-size-adjust: 100% !important;
-        }
-        body {
-          -webkit-text-size-adjust: 100% !important;
-          text-size-adjust: 100% !important;
-          zoom: 1.0 !important;
-        }
-      \`;
-      document.head.appendChild(style);
-      
-      console.log('WebView: Font size adjustments applied');
-    })();
-    true;
-  `;
-
-  return (
-    <SafeAreaView 
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      edges={['top', 'left', 'right']}
-    >
-      <WebView
-        source={{ uri: websiteUrl }}
-        style={styles.webview}
-        onLoadStart={() => {
-          console.log("WebView: Started loading website");
-          setLoading(true);
-        }}
-        onLoadEnd={() => {
-          console.log("WebView: Finished loading website");
-          setLoading(false);
-        }}
-        onError={(syntheticEvent) => {
-          const { nativeEvent } = syntheticEvent;
-          console.error("WebView: Error loading website", nativeEvent);
-          setLoading(false);
-        }}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={true}
-        scalesPageToFit={true}
-        allowsBackForwardNavigationGestures={Platform.OS === 'ios'}
-        injectedJavaScript={injectedJavaScript}
-        onMessage={(event) => {
-          console.log("WebView message:", event.nativeEvent.data);
-        }}
-      />
-      {loading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator 
-            size="large" 
-            color={theme.colors.primary}
-          />
-        </View>
-      )}
-    </SafeAreaView>
-  );
-}
+import { useTheme } from "@react-navigation/native";
+import React, { useState } from "react";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  webview: {
-    flex: 1,
-  },
   loadingContainer: {
     position: 'absolute',
     top: 0,
@@ -103,6 +14,88 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#fff',
+    zIndex: 1,
   },
 });
+
+export default function HomeScreen() {
+  const { colors } = useTheme();
+  const [loading, setLoading] = useState(true);
+
+  const handleLoad = () => {
+    setLoading(false);
+  };
+
+  // Inject CSS to make fonts smaller and match original website
+  const injectedJavaScript = `
+    (function() {
+      const style = document.createElement('style');
+      style.textContent = \`
+        * {
+          font-size: 14px !important;
+          line-height: 1.3 !important;
+        }
+        h1, h1 * {
+          font-size: 28px !important;
+          line-height: 1.2 !important;
+        }
+        h2, h2 * {
+          font-size: 20px !important;
+          line-height: 1.2 !important;
+        }
+        h3, h3 * {
+          font-size: 16px !important;
+          line-height: 1.2 !important;
+        }
+        button, button * {
+          font-size: 14px !important;
+          padding: 10px 16px !important;
+        }
+        input, input * {
+          font-size: 14px !important;
+          padding: 8px 12px !important;
+        }
+        label, label * {
+          font-size: 13px !important;
+        }
+        small, small * {
+          font-size: 12px !important;
+        }
+        .text-sm, .text-sm * {
+          font-size: 13px !important;
+        }
+        .text-xs, .text-xs * {
+          font-size: 11px !important;
+        }
+        body {
+          zoom: 0.9;
+          -webkit-text-size-adjust: 90%;
+          text-size-adjust: 90%;
+        }
+      \`;
+      document.head.appendChild(style);
+    })();
+    true;
+  `;
+
+  return (
+    <View style={{ flex: 1 }}>
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )}
+      <WebView
+        source={{ uri: 'https://ogzodefnqsype.mocha.app' }}
+        style={{ flex: 1 }}
+        onLoad={handleLoad}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        injectedJavaScript={injectedJavaScript}
+        scalesPageToFit={true}
+        startInLoadingState={false}
+      />
+    </View>
+  );
+}
