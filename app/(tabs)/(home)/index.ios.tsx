@@ -24,54 +24,68 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   const handleLoad = () => {
+    console.log('WebView loaded successfully on iOS');
     setLoading(false);
   };
 
-  // Inject CSS to make fonts smaller and match original website
+  // Inject CSS to make fonts much smaller to match original website
   const injectedJavaScript = `
     (function() {
       const style = document.createElement('style');
       style.textContent = \`
         * {
-          font-size: 14px !important;
-          line-height: 1.3 !important;
+          font-size: 11px !important;
+          line-height: 1.2 !important;
         }
         h1, h1 * {
-          font-size: 28px !important;
-          line-height: 1.2 !important;
+          font-size: 18px !important;
+          line-height: 1.1 !important;
         }
         h2, h2 * {
-          font-size: 20px !important;
-          line-height: 1.2 !important;
+          font-size: 15px !important;
+          line-height: 1.1 !important;
         }
         h3, h3 * {
-          font-size: 16px !important;
-          line-height: 1.2 !important;
+          font-size: 13px !important;
+          line-height: 1.1 !important;
+        }
+        h4, h4 * {
+          font-size: 12px !important;
+          line-height: 1.1 !important;
         }
         button, button * {
-          font-size: 14px !important;
-          padding: 10px 16px !important;
+          font-size: 11px !important;
+          padding: 6px 12px !important;
         }
-        input, input * {
-          font-size: 14px !important;
-          padding: 8px 12px !important;
+        input, input *, textarea, textarea * {
+          font-size: 11px !important;
+          padding: 6px 10px !important;
         }
         label, label * {
-          font-size: 13px !important;
+          font-size: 10px !important;
         }
         small, small * {
-          font-size: 12px !important;
+          font-size: 9px !important;
         }
         .text-sm, .text-sm * {
-          font-size: 13px !important;
+          font-size: 10px !important;
         }
         .text-xs, .text-xs * {
-          font-size: 11px !important;
+          font-size: 9px !important;
+        }
+        .text-lg, .text-lg * {
+          font-size: 13px !important;
+        }
+        .text-xl, .text-xl * {
+          font-size: 15px !important;
+        }
+        .text-2xl, .text-2xl * {
+          font-size: 17px !important;
         }
         body {
-          zoom: 0.9;
-          -webkit-text-size-adjust: 90%;
-          text-size-adjust: 90%;
+          zoom: 0.85;
+          -webkit-text-size-adjust: 85%;
+          text-size-adjust: 85%;
         }
       \`;
       document.head.appendChild(style);

@@ -20,6 +20,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const handleLoad = () => {
+    console.log('Website loaded successfully in iframe');
     setLoading(false);
   };
 
@@ -37,7 +38,7 @@ export default function Home() {
           width: '100%', 
           height: '100%', 
           border: 'none',
-          zoom: 0.9,
+          zoom: 0.85,
         }}
         onLoad={handleLoad}
       />
