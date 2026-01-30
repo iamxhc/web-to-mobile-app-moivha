@@ -13,6 +13,38 @@ export default function HomeScreen() {
 
   const websiteUrl = "https://ogzodefnqsype.mocha.app";
 
+  // Inject CSS to adjust font sizes to match original website on phone
+  const injectedJavaScript = `
+    (function() {
+      // Set viewport to match desktop view with proper scaling
+      var meta = document.querySelector('meta[name="viewport"]');
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = 'viewport';
+        document.head.appendChild(meta);
+      }
+      meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+      
+      // Adjust text size to match original website
+      var style = document.createElement('style');
+      style.innerHTML = \`
+        * {
+          -webkit-text-size-adjust: 100% !important;
+          text-size-adjust: 100% !important;
+        }
+        body {
+          -webkit-text-size-adjust: 100% !important;
+          text-size-adjust: 100% !important;
+          zoom: 1.0 !important;
+        }
+      \`;
+      document.head.appendChild(style);
+      
+      console.log('WebView: Font size adjustments applied');
+    })();
+    true;
+  `;
+
   return (
     <SafeAreaView 
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -39,6 +71,10 @@ export default function HomeScreen() {
         startInLoadingState={true}
         scalesPageToFit={true}
         allowsBackForwardNavigationGestures={Platform.OS === 'ios'}
+        injectedJavaScript={injectedJavaScript}
+        onMessage={(event) => {
+          console.log("WebView message:", event.nativeEvent.data);
+        }}
       />
       {loading && (
         <View style={styles.loadingContainer}>
