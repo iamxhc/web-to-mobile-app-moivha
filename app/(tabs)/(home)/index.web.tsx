@@ -24,7 +24,7 @@ export default function Home() {
     console.log('Website loaded successfully in iframe');
     setLoading(false);
     
-    // Try to inject CSS into iframe to hide "clone with mocha" text
+    // Try to inject CSS into iframe to hide "clone with mocha" button
     try {
       const iframe = iframeRef.current;
       if (iframe && iframe.contentWindow && iframe.contentDocument) {
@@ -43,21 +43,59 @@ export default function Home() {
           a[href*="mocha"] {
             display: none !important;
           }
+          button[class*="clone"] {
+            display: none !important;
+          }
+          [class*="clone"] {
+            display: none !important;
+          }
         `;
         iframeDoc.head.appendChild(style);
         
-        // Remove elements containing "clone with mocha"
-        setTimeout(() => {
+        // Function to hide elements containing "clone with mocha"
+        const hideCloneElements = () => {
+          console.log('Running hideCloneElements function on web');
           const allElements = iframeDoc.querySelectorAll('*');
+          let hiddenCount = 0;
+          
           allElements.forEach((el) => {
-            if (el.textContent && el.textContent.toLowerCase().includes('clone with mocha')) {
+            const text = el.textContent || '';
+            const lowerText = text.toLowerCase();
+            
+            if (lowerText.includes('clone with mocha') || 
+                lowerText.includes('clone with') ||
+                (el.tagName === 'BUTTON' && lowerText.includes('clone')) ||
+                (el.tagName === 'A' && lowerText.includes('clone'))) {
               (el as HTMLElement).style.display = 'none';
+              (el as HTMLElement).style.visibility = 'hidden';
+              (el as HTMLElement).style.opacity = '0';
+              (el as HTMLElement).style.height = '0';
+              (el as HTMLElement).style.overflow = 'hidden';
+              el.remove();
+              hiddenCount++;
+              console.log('Hidden element on web:', el.tagName, text.substring(0, 50));
             }
           });
-        }, 500);
+          
+          console.log('Total elements hidden on web:', hiddenCount);
+        };
+        
+        // Run immediately
+        hideCloneElements();
+        
+        // Run after delays
+        setTimeout(hideCloneElements, 500);
+        setTimeout(hideCloneElements, 1500);
+        
+        // Watch for DOM changes
+        const observer = new MutationObserver(hideCloneElements);
+        observer.observe(iframeDoc.body, {
+          childList: true,
+          subtree: true
+        });
       }
     } catch (e) {
-      console.log('Could not inject CSS into iframe (cross-origin restriction)');
+      console.log('Could not inject CSS into iframe (cross-origin restriction):', e);
     }
   };
 

@@ -28,9 +28,11 @@ export default function HomeScreen() {
     setLoading(false);
   };
 
-  // Inject CSS to make fonts smaller and hide "clone with mocha" text
+  // Enhanced injection to hide "clone with mocha" button
   const injectedJavaScript = `
     (function() {
+      console.log('Injecting CSS and JavaScript to hide clone with mocha button on iOS');
+      
       const style = document.createElement('style');
       style.textContent = \`
         * {
@@ -88,7 +90,7 @@ export default function HomeScreen() {
           text-size-adjust: 85%;
         }
         
-        /* Hide "clone with mocha" text at the bottom */
+        /* Hide "clone with mocha" button and related elements */
         footer {
           display: none !important;
         }
@@ -101,21 +103,65 @@ export default function HomeScreen() {
         a[href*="mocha"] {
           display: none !important;
         }
-        *:contains("clone with mocha") {
+        button[class*="clone"] {
+          display: none !important;
+        }
+        [class*="clone"] {
           display: none !important;
         }
       \`;
       document.head.appendChild(style);
       
-      // Additional JavaScript to remove elements containing "clone with mocha"
-      setTimeout(function() {
+      // Function to aggressively hide elements containing "clone with mocha"
+      function hideCloneElements() {
+        console.log('Running hideCloneElements function on iOS');
         const allElements = document.querySelectorAll('*');
+        let hiddenCount = 0;
+        
         allElements.forEach(function(el) {
-          if (el.textContent && el.textContent.toLowerCase().includes('clone with mocha')) {
+          const text = el.textContent || '';
+          const lowerText = text.toLowerCase();
+          
+          // Check if element contains "clone with mocha" or just "clone" in button context
+          if (lowerText.includes('clone with mocha') || 
+              lowerText.includes('clone with') ||
+              (el.tagName === 'BUTTON' && lowerText.includes('clone')) ||
+              (el.tagName === 'A' && lowerText.includes('clone'))) {
             el.style.display = 'none';
+            el.style.visibility = 'hidden';
+            el.style.opacity = '0';
+            el.style.height = '0';
+            el.style.overflow = 'hidden';
+            el.remove();
+            hiddenCount++;
+            console.log('Hidden element on iOS:', el.tagName, text.substring(0, 50));
           }
         });
-      }, 500);
+        
+        console.log('Total elements hidden on iOS:', hiddenCount);
+      }
+      
+      // Run immediately
+      hideCloneElements();
+      
+      // Run after short delay
+      setTimeout(hideCloneElements, 500);
+      
+      // Run after longer delay
+      setTimeout(hideCloneElements, 1500);
+      
+      // Run after page fully loads
+      window.addEventListener('load', hideCloneElements);
+      
+      // Watch for DOM changes and hide new elements
+      const observer = new MutationObserver(function(mutations) {
+        hideCloneElements();
+      });
+      
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
     })();
     true;
   `;
