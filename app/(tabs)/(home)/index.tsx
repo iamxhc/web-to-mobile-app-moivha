@@ -28,7 +28,7 @@ export default function HomeScreen() {
     setLoading(false);
   };
 
-  // Inject CSS to make fonts much smaller to match original website
+  // Inject CSS to make fonts smaller and hide "clone with mocha" text
   const injectedJavaScript = `
     (function() {
       const style = document.createElement('style');
@@ -87,8 +87,35 @@ export default function HomeScreen() {
           -webkit-text-size-adjust: 85%;
           text-size-adjust: 85%;
         }
+        
+        /* Hide "clone with mocha" text at the bottom */
+        footer {
+          display: none !important;
+        }
+        [class*="footer"] {
+          display: none !important;
+        }
+        [id*="footer"] {
+          display: none !important;
+        }
+        a[href*="mocha"] {
+          display: none !important;
+        }
+        *:contains("clone with mocha") {
+          display: none !important;
+        }
       \`;
       document.head.appendChild(style);
+      
+      // Additional JavaScript to remove elements containing "clone with mocha"
+      setTimeout(function() {
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(function(el) {
+          if (el.textContent && el.textContent.toLowerCase().includes('clone with mocha')) {
+            el.style.display = 'none';
+          }
+        });
+      }, 500);
     })();
     true;
   `;
