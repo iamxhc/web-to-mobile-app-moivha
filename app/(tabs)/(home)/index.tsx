@@ -28,66 +28,95 @@ export default function HomeScreen() {
     setLoading(false);
   };
 
-  // Enhanced injection to hide "clone with mocha" button
+  // Enhanced injection to hide "clone with mocha" button and reduce font sizes
   const injectedJavaScript = `
     (function() {
-      console.log('Injecting CSS and JavaScript to hide clone with mocha button');
+      console.log('Injecting CSS and JavaScript to hide clone with mocha button and reduce font sizes');
       
       const style = document.createElement('style');
       style.textContent = \`
         * {
-          font-size: 11px !important;
-          line-height: 1.2 !important;
+          font-size: 9px !important;
+          line-height: 1.15 !important;
         }
         h1, h1 * {
-          font-size: 18px !important;
+          font-size: 14px !important;
           line-height: 1.1 !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
         }
         h2, h2 * {
-          font-size: 15px !important;
-          line-height: 1.1 !important;
-        }
-        h3, h3 * {
-          font-size: 13px !important;
-          line-height: 1.1 !important;
-        }
-        h4, h4 * {
           font-size: 12px !important;
           line-height: 1.1 !important;
         }
-        button, button * {
+        h3, h3 * {
           font-size: 11px !important;
-          padding: 6px 12px !important;
+          line-height: 1.1 !important;
+        }
+        h4, h4 * {
+          font-size: 10px !important;
+          line-height: 1.1 !important;
+        }
+        h5, h5 * {
+          font-size: 9px !important;
+          line-height: 1.1 !important;
+        }
+        h6, h6 * {
+          font-size: 9px !important;
+          line-height: 1.1 !important;
+        }
+        button, button * {
+          font-size: 9px !important;
+          padding: 4px 8px !important;
         }
         input, input *, textarea, textarea * {
-          font-size: 11px !important;
-          padding: 6px 10px !important;
+          font-size: 9px !important;
+          padding: 4px 8px !important;
         }
         label, label * {
-          font-size: 10px !important;
+          font-size: 8px !important;
         }
         small, small * {
-          font-size: 9px !important;
+          font-size: 8px !important;
         }
         .text-sm, .text-sm * {
-          font-size: 10px !important;
+          font-size: 8px !important;
         }
         .text-xs, .text-xs * {
-          font-size: 9px !important;
+          font-size: 7px !important;
         }
         .text-lg, .text-lg * {
-          font-size: 13px !important;
+          font-size: 10px !important;
         }
         .text-xl, .text-xl * {
-          font-size: 15px !important;
+          font-size: 12px !important;
         }
         .text-2xl, .text-2xl * {
-          font-size: 17px !important;
+          font-size: 13px !important;
+        }
+        .text-3xl, .text-3xl * {
+          font-size: 14px !important;
+        }
+        p, p *, div, div *, span, span * {
+          font-size: 9px !important;
+          line-height: 1.2 !important;
         }
         body {
-          zoom: 0.85;
-          -webkit-text-size-adjust: 85%;
-          text-size-adjust: 85%;
+          zoom: 0.75;
+          -webkit-text-size-adjust: 75%;
+          text-size-adjust: 75%;
+        }
+        
+        /* Make activity details more compact */
+        .activity, .activity *, 
+        [class*="activity"], [class*="activity"] *,
+        .card, .card *,
+        [class*="card"], [class*="card"] * {
+          font-size: 8px !important;
+          line-height: 1.15 !important;
+          padding: 3px 6px !important;
+          margin: 2px !important;
         }
         
         /* Aggressively hide "clone with mocha" button and related elements */
