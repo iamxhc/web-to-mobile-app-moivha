@@ -31,23 +31,26 @@ export default function Home() {
         const iframeDoc = iframe.contentDocument;
         const style = iframeDoc.createElement('style');
         style.textContent = `
-          footer {
+          /* Aggressively hide "clone with mocha" button and related elements */
+          footer,
+          [class*="footer"],
+          [id*="footer"],
+          a[href*="mocha"],
+          a[href*="clone"],
+          button[class*="clone"],
+          [class*="clone"],
+          [id*="clone"],
+          div[class*="mocha"],
+          div[id*="mocha"] {
             display: none !important;
-          }
-          [class*="footer"] {
-            display: none !important;
-          }
-          [id*="footer"] {
-            display: none !important;
-          }
-          a[href*="mocha"] {
-            display: none !important;
-          }
-          button[class*="clone"] {
-            display: none !important;
-          }
-          [class*="clone"] {
-            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            width: 0 !important;
+            overflow: hidden !important;
+            position: absolute !important;
+            left: -9999px !important;
+            pointer-events: none !important;
           }
         `;
         iframeDoc.head.appendChild(style);
@@ -55,25 +58,52 @@ export default function Home() {
         // Function to hide elements containing "clone with mocha"
         const hideCloneElements = () => {
           console.log('Running hideCloneElements function on web');
-          const allElements = iframeDoc.querySelectorAll('*');
           let hiddenCount = 0;
           
-          allElements.forEach((el) => {
-            const text = el.textContent || '';
-            const lowerText = text.toLowerCase();
+          // Target all buttons and links
+          const buttons = iframeDoc.querySelectorAll('button, a, div[role="button"], span[role="button"]');
+          buttons.forEach((el) => {
+            const text = (el.textContent || '').toLowerCase().trim();
+            const innerHTML = (el.innerHTML || '').toLowerCase();
+            const ariaLabel = (el.getAttribute('aria-label') || '').toLowerCase();
             
-            if (lowerText.includes('clone with mocha') || 
-                lowerText.includes('clone with') ||
-                (el.tagName === 'BUTTON' && lowerText.includes('clone')) ||
-                (el.tagName === 'A' && lowerText.includes('clone'))) {
-              (el as HTMLElement).style.display = 'none';
-              (el as HTMLElement).style.visibility = 'hidden';
-              (el as HTMLElement).style.opacity = '0';
-              (el as HTMLElement).style.height = '0';
-              (el as HTMLElement).style.overflow = 'hidden';
-              el.remove();
+            if (text.includes('clone') || 
+                innerHTML.includes('clone') || 
+                ariaLabel.includes('clone') ||
+                text.includes('mocha') ||
+                innerHTML.includes('mocha')) {
+              (el as HTMLElement).style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; position: absolute !important; left: -9999px !important; pointer-events: none !important;';
+              
+              try {
+                el.remove();
+              } catch(e) {
+                console.log('Could not remove element:', e);
+              }
+              
               hiddenCount++;
               console.log('Hidden element on web:', el.tagName, text.substring(0, 50));
+            }
+          });
+          
+          // Also check for parent containers
+          const allDivs = iframeDoc.querySelectorAll('div, section, footer, aside');
+          allDivs.forEach((el) => {
+            const text = (el.textContent || '').toLowerCase().trim();
+            
+            if (text === 'clone with mocha' || 
+                text === 'clone with' || 
+                text === 'clone' ||
+                (text.includes('clone') && text.length < 50)) {
+              (el as HTMLElement).style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; position: absolute !important; left: -9999px !important; pointer-events: none !important;';
+              
+              try {
+                el.remove();
+              } catch(e) {
+                console.log('Could not remove container:', e);
+              }
+              
+              hiddenCount++;
+              console.log('Hidden container on web:', el.tagName, text.substring(0, 50));
             }
           });
           
@@ -83,16 +113,25 @@ export default function Home() {
         // Run immediately
         hideCloneElements();
         
-        // Run after delays
+        // Run multiple times with delays
+        setTimeout(hideCloneElements, 100);
+        setTimeout(hideCloneElements, 300);
         setTimeout(hideCloneElements, 500);
+        setTimeout(hideCloneElements, 1000);
         setTimeout(hideCloneElements, 1500);
+        setTimeout(hideCloneElements, 2000);
+        setTimeout(hideCloneElements, 3000);
         
         // Watch for DOM changes
         const observer = new MutationObserver(hideCloneElements);
         observer.observe(iframeDoc.body, {
           childList: true,
-          subtree: true
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['class', 'id', 'style']
         });
+        
+        console.log('Clone button hiding script initialized on web');
       }
     } catch (e) {
       console.log('Could not inject CSS into iframe (cross-origin restriction):', e);

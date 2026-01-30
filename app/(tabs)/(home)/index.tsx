@@ -90,24 +90,26 @@ export default function HomeScreen() {
           text-size-adjust: 85%;
         }
         
-        /* Hide "clone with mocha" button and related elements */
-        footer {
+        /* Aggressively hide "clone with mocha" button and related elements */
+        footer,
+        [class*="footer"],
+        [id*="footer"],
+        a[href*="mocha"],
+        a[href*="clone"],
+        button[class*="clone"],
+        [class*="clone"],
+        [id*="clone"],
+        div[class*="mocha"],
+        div[id*="mocha"] {
           display: none !important;
-        }
-        [class*="footer"] {
-          display: none !important;
-        }
-        [id*="footer"] {
-          display: none !important;
-        }
-        a[href*="mocha"] {
-          display: none !important;
-        }
-        button[class*="clone"] {
-          display: none !important;
-        }
-        [class*="clone"] {
-          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+          height: 0 !important;
+          width: 0 !important;
+          overflow: hidden !important;
+          position: absolute !important;
+          left: -9999px !important;
+          pointer-events: none !important;
         }
       \`;
       document.head.appendChild(style);
@@ -115,26 +117,55 @@ export default function HomeScreen() {
       // Function to aggressively hide elements containing "clone with mocha"
       function hideCloneElements() {
         console.log('Running hideCloneElements function');
-        const allElements = document.querySelectorAll('*');
         let hiddenCount = 0;
         
-        allElements.forEach(function(el) {
-          const text = el.textContent || '';
-          const lowerText = text.toLowerCase();
+        // Target all buttons and links
+        const buttons = document.querySelectorAll('button, a, div[role="button"], span[role="button"]');
+        buttons.forEach(function(el) {
+          const text = (el.textContent || '').toLowerCase().trim();
+          const innerHTML = (el.innerHTML || '').toLowerCase();
+          const ariaLabel = (el.getAttribute('aria-label') || '').toLowerCase();
           
-          // Check if element contains "clone with mocha" or just "clone" in button context
-          if (lowerText.includes('clone with mocha') || 
-              lowerText.includes('clone with') ||
-              (el.tagName === 'BUTTON' && lowerText.includes('clone')) ||
-              (el.tagName === 'A' && lowerText.includes('clone'))) {
-            el.style.display = 'none';
-            el.style.visibility = 'hidden';
-            el.style.opacity = '0';
-            el.style.height = '0';
-            el.style.overflow = 'hidden';
-            el.remove();
+          // Check if element contains "clone" text
+          if (text.includes('clone') || 
+              innerHTML.includes('clone') || 
+              ariaLabel.includes('clone') ||
+              text.includes('mocha') ||
+              innerHTML.includes('mocha')) {
+            el.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; position: absolute !important; left: -9999px !important; pointer-events: none !important;';
+            
+            // Also try to remove from DOM
+            try {
+              el.remove();
+            } catch(e) {
+              console.log('Could not remove element:', e);
+            }
+            
             hiddenCount++;
             console.log('Hidden element:', el.tagName, text.substring(0, 50));
+          }
+        });
+        
+        // Also check for parent containers that might contain the button
+        const allDivs = document.querySelectorAll('div, section, footer, aside');
+        allDivs.forEach(function(el) {
+          const text = (el.textContent || '').toLowerCase().trim();
+          
+          // If a container only contains "clone" text, hide it
+          if (text === 'clone with mocha' || 
+              text === 'clone with' || 
+              text === 'clone' ||
+              (text.includes('clone') && text.length < 50)) {
+            el.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; width: 0 !important; position: absolute !important; left: -9999px !important; pointer-events: none !important;';
+            
+            try {
+              el.remove();
+            } catch(e) {
+              console.log('Could not remove container:', e);
+            }
+            
+            hiddenCount++;
+            console.log('Hidden container:', el.tagName, text.substring(0, 50));
           }
         });
         
@@ -144,13 +175,19 @@ export default function HomeScreen() {
       // Run immediately
       hideCloneElements();
       
-      // Run after short delay
+      // Run multiple times with delays
+      setTimeout(hideCloneElements, 100);
+      setTimeout(hideCloneElements, 300);
       setTimeout(hideCloneElements, 500);
-      
-      // Run after longer delay
+      setTimeout(hideCloneElements, 1000);
       setTimeout(hideCloneElements, 1500);
+      setTimeout(hideCloneElements, 2000);
+      setTimeout(hideCloneElements, 3000);
       
       // Run after page fully loads
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', hideCloneElements);
+      }
       window.addEventListener('load', hideCloneElements);
       
       // Watch for DOM changes and hide new elements
@@ -160,8 +197,12 @@ export default function HomeScreen() {
       
       observer.observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'id', 'style']
       });
+      
+      console.log('Clone button hiding script initialized');
     })();
     true;
   `;
